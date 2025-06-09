@@ -27,3 +27,7 @@ export interface MapState {
   }
   zoom: number
 }
+
+export interface UserFavorites {
+  [id: string]: boolean
+}

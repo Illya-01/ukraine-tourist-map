@@ -19,25 +19,25 @@ export default function MapLegend() {
         Категорії пам'яток:
       </Typography>
       <Box display="flex" alignItems="center" mb={0.5}>
-        <Box component="img" src="marker-historical-sm.png" alt="Історичні" width={20} mr={1} />
+        <Box component="img" src="img/marker-historical-sm.png" alt="Історичні" width={20} mr={1} />
         <Typography variant="body2">Історичні</Typography>
       </Box>
       <Box display="flex" alignItems="center" mb={0.5}>
-        <Box component="img" src="marker-natural-sm.png" alt="Природні" width={20} mr={1} />
+        <Box component="img" src="img/marker-natural-sm.png" alt="Природні" width={20} mr={1} />
         <Typography variant="body2">Природні</Typography>
       </Box>
       <Box display="flex" alignItems="center" mb={0.5}>
-        <Box component="img" src="marker-cultural-sm.png" alt="Культурні" width={20} mr={1} />
+        <Box component="img" src="img/marker-cultural-sm.png" alt="Культурні" width={20} mr={1} />
         <Typography variant="body2">Культурні</Typography>
       </Box>
       <Box display="flex" alignItems="center" mb={0.5}>
-        <Box component="img" src="marker-religious-sm.png" alt="Релігійні" width={20} mr={1} />
+        <Box component="img" src="img/marker-religious-sm.png" alt="Релігійні" width={20} mr={1} />
         <Typography variant="body2">Релігійні</Typography>
       </Box>
       <Box display="flex" alignItems="center">
         <Box
           component="img"
-          src="marker-entertainment-sm.png"
+          src="img/marker-entertainment-sm.png"
           alt="Розважальні"
           width={20}
           mr={1}

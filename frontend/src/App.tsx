@@ -3,6 +3,7 @@ import { Box, CssBaseline, ThemeProvider, createTheme, Snackbar, Alert } from '@
 import Header from './components/Header'
 import MapComponent from './components/Map'
 import Sidebar from './components/Sidebar'
+import AttractionsList from './components/AttractionList'
 import { Attraction, AttractionCategory } from './types'
 import { fetchAttractions } from './services/api'
 
@@ -27,6 +28,7 @@ function App() {
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success')
+  const [viewMode, setViewMode] = useState<'map' | 'list'>('map')
 
   useEffect(() => {
     const loadAttractions = async () => {
@@ -60,6 +62,10 @@ function App() {
 
   const handleCategorySelect = (category: AttractionCategory | null) => {
     setSelectedCategory(category)
+  }
+
+  const handleViewModeChange = (mode: 'map' | 'list') => {
+    setViewMode(mode)
   }
 
   const handleAddAttractions = (newAttractions: Attraction[]) => {
@@ -103,15 +109,26 @@ function App() {
           onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
           onSearch={handleSearch}
           onCategorySelect={handleCategorySelect}
+          onViewModeChange={handleViewModeChange}
+          viewMode={viewMode}
         />
+
         <Box component="main" sx={{ flexGrow: 1, position: 'relative' }}>
-          <MapComponent
-            attractions={filteredAttractions}
-            isLoading={isLoading}
-            onSelectAttraction={handleAttractionSelect}
-            onAddAttractions={handleAddAttractions}
-          />
+          {viewMode === 'map' ? (
+            <MapComponent
+              attractions={filteredAttractions}
+              isLoading={isLoading}
+              onSelectAttraction={handleAttractionSelect}
+              onAddAttractions={handleAddAttractions}
+            />
+          ) : (
+            <AttractionsList
+              attractions={filteredAttractions}
+              onSelectAttraction={handleAttractionSelect}
+            />
+          )}
         </Box>
+
         <Sidebar open={sidebarOpen} onClose={handleSidebarClose} attraction={selectedAttraction} />
 
         <Snackbar

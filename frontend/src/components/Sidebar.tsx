@@ -2,6 +2,8 @@ import { Box, Typography, Drawer, IconButton, Rating, Divider } from '@mui/mater
 import CloseIcon from '@mui/icons-material/Close'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import { Attraction } from '../types'
+import LazyImage from './LazyImage'
+import { getImageUrl } from '../utils'
 
 interface SidebarProps {
   open: boolean
@@ -12,14 +14,6 @@ interface SidebarProps {
 export default function Sidebar({ open, onClose, attraction }: SidebarProps) {
   if (!attraction) {
     return null
-  }
-
-  // Перевірка, чи шлях зображення є URL або локальним файлом
-  const getImageUrl = (image: string) => {
-    if (image.startsWith('http')) {
-      return image
-    }
-    return image // Якщо використовуються локальні зображення з папки public
   }
 
   // Функція для отримання назви категорії українською
@@ -55,11 +49,12 @@ export default function Sidebar({ open, onClose, attraction }: SidebarProps) {
 
         {attraction.images && attraction.images.length > 0 && (
           <Box mb={2}>
-            <img
+            <LazyImage
               src={getImageUrl(attraction.images[0])}
               alt={attraction.name}
-              style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 8 }}
-              onError={e => ((e.target as HTMLImageElement).src = '/default-image.png')}
+              height={200}
+              borderRadius={2}
+              fallbackSrc="img/default-image.png"
             />
           </Box>
         )}

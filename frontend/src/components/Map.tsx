@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef } from 'react'
+import { useCallback, useState, useRef, useEffect } from 'react'
 import {
   GoogleMap,
   Marker,
@@ -6,11 +6,17 @@ import {
   useLoadScript,
   MarkerClusterer,
 } from '@react-google-maps/api'
-import { Box, Typography, CircularProgress, Fab, Rating } from '@mui/material'
+import MyLocationIcon from '@mui/icons-material/MyLocation'
+import { Box, Typography, CircularProgress, Fab, Rating, IconButton } from '@mui/material'
 import ExploreIcon from '@mui/icons-material/Explore'
-import { Attraction, AttractionCategory } from '../types'
+import FavoriteIcon from '@mui/icons-material/Favorite'
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
+import { Attraction, AttractionCategory, UserFavorites } from '../types'
 import MapLegend from './MapLegend'
 import { fetchNearbyAttractions } from '../services/api'
+import StarRating from './StarRating'
+import LazyImage from './LazyImage'
+import { getImageUrl } from '../utils'
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
 
@@ -73,7 +79,49 @@ export default function MapComponent({
   const [selectedAttraction, setSelectedAttraction] = useState<Attraction | null>(null)
   const [mapCenter, setMapCenter] = useState(DEFAULT_CENTER)
   const [loadingNearby, setLoadingNearby] = useState(false)
+  const [userLocation, setUserLocation] = useState<null | { lat: number; lng: number }>(null)
+  const [favorites, setFavorites] = useState<UserFavorites>({})
   const mapRef = useRef<google.maps.Map | null>(null)
+
+  const handleGetUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          }
+          setUserLocation(location)
+          if (mapRef.current) {
+            mapRef.current.panTo(location)
+            mapRef.current.setZoom(13)
+          }
+        },
+        () => {
+          alert('Не вдалося отримати ваше місцезнаходження')
+        }
+      )
+    } else {
+      alert('Геолокація не підтримується вашим браузером')
+    }
+  }
+
+  useEffect(() => {
+    const savedFavorites = localStorage.getItem('favorites')
+    if (savedFavorites) {
+      setFavorites(JSON.parse(savedFavorites))
+    }
+  }, [])
+
+  useEffect(() => {
+    if (loadError) {
+      console.error('Error loading Google Maps API:', loadError)
+      showSnackbar(
+        "Не вдалося завантажити Google Maps. Перевірте ваше з'єднання з Інтернетом.",
+        'error'
+      )
+    }
+  }, [loadError])
 
   const handleMarkerClick = useCallback(
     (attraction: Attraction) => {
@@ -124,6 +172,15 @@ export default function MapComponent({
     }
   }, [mapCenter, onAddAttractions])
 
+  const toggleFavorite = (attraction: Attraction) => {
+    const newFavorites = {
+      ...favorites,
+      [attraction.id]: !favorites[attraction.id],
+    }
+    setFavorites(newFavorites)
+    localStorage.setItem('favorites', JSON.stringify(newFavorites))
+  }
+
   if (loadError) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="100%">
@@ -165,59 +222,60 @@ export default function MapComponent({
             </>
           )}
         </MarkerClusterer>
+
         {selectedAttraction && (
           <InfoWindow
             key={selectedAttraction.id ? `info-${selectedAttraction.id}` : 'info-selected'}
             position={selectedAttraction.location}
             onCloseClick={handleInfoWindowClose}
           >
-            <Box p={1} maxWidth={240}>
+            <Box sx={{ position: 'relative', width: '100%' }}>
               {selectedAttraction.images && selectedAttraction.images.length > 0 && (
-                <Box
-                  component="img"
-                  src={
-                    selectedAttraction.images[0].startsWith('http')
-                      ? selectedAttraction.images[0]
-                      : `/images/${selectedAttraction.images[0]}`
-                  }
+                <LazyImage
+                  src={getImageUrl(selectedAttraction.images[0])}
                   alt={selectedAttraction.name}
-                  sx={{
-                    width: '100%',
-                    height: 120,
-                    objectFit: 'cover',
-                    borderRadius: 1,
-                    mb: 1,
-                  }}
-                  onError={e => {
-                    const target = e.target as HTMLImageElement
-                    target.onerror = null
-                    target.src = 'img/default-image.png'
-                  }}
+                  height={120}
+                  borderRadius={1}
+                  sx={{ mb: 1 }}
+                  fallbackSrc="img/default-image.png"
                 />
               )}
-              <Typography
-                variant="subtitle1"
-                fontWeight="bold"
-                gutterBottom
-                sx={{ lineHeight: 1.25, mb: 1 }}
+
+              <Box p={1} maxWidth={240}>
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="bold"
+                  gutterBottom
+                  sx={{ lineHeight: 1.25, mb: 1 }}
+                >
+                  {selectedAttraction.name}
+                </Typography>
+
+                <Typography variant="body2">
+                  {selectedAttraction.description.length > 100
+                    ? `${selectedAttraction.description.substring(0, 100)}...`
+                    : selectedAttraction.description}
+                </Typography>
+
+                {selectedAttraction.rating && (
+                  <StarRating rating={selectedAttraction.rating} showValue={true} size="small" />
+                )}
+              </Box>
+
+              <IconButton
+                onClick={e => {
+                  e.stopPropagation()
+                  toggleFavorite(selectedAttraction)
+                }}
+                size="small"
+                sx={{ position: 'absolute', top: 5, right: 5 }}
               >
-                {selectedAttraction.name}
-              </Typography>
-
-              <Typography variant="body2">
-                {selectedAttraction.description.length > 100
-                  ? `${selectedAttraction.description.substring(0, 100)}...`
-                  : selectedAttraction.description}
-              </Typography>
-
-              {selectedAttraction.rating && (
-                <Box display="flex" alignItems="center" mt={1}>
-                  <Rating value={selectedAttraction.rating} precision={0.1} readOnly />
-                  <Typography variant="body2" color="text.secondary" ml={1}>
-                    {selectedAttraction.rating.toFixed(1)}
-                  </Typography>
-                </Box>
-              )}
+                {favorites[selectedAttraction.id] ? (
+                  <FavoriteIcon color="error" />
+                ) : (
+                  <FavoriteBorderIcon />
+                )}
+              </IconButton>
             </Box>
           </InfoWindow>
         )}
@@ -234,6 +292,18 @@ export default function MapComponent({
       >
         {loadingNearby ? <CircularProgress size={24} color="inherit" /> : <ExploreIcon />}
       </Fab>
+
+      <Fab
+        color="primary"
+        sx={{ position: 'absolute', bottom: 16, right: 80 }}
+        onClick={handleGetUserLocation}
+        title="Моє місцезнаходження"
+      >
+        <MyLocationIcon />
+      </Fab>
     </Box>
   )
+}
+function showSnackbar(arg0: string, arg1: string) {
+  throw new Error('Function not implemented.')
 }
