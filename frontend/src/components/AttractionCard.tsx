@@ -3,13 +3,19 @@ import { Attraction } from '../types'
 import StarRating from './StarRating'
 import LazyImage from './LazyImage'
 import { getImageUrl, getCategoryName, getCategoryColor } from '../utils'
+import FavoriteButton from './FavoriteButton'
 
 interface AttractionCardProps {
   attraction: Attraction
   onSelect: (attraction: Attraction) => void
+  onOpenAuthModal?: () => void
 }
 
-export default function AttractionCard({ attraction, onSelect }: AttractionCardProps) {
+export default function AttractionCard({
+  attraction,
+  onSelect,
+  onOpenAuthModal,
+}: AttractionCardProps) {
   return (
     <ListItemButton
       onClick={() => onSelect(attraction)}
@@ -21,8 +27,11 @@ export default function AttractionCard({ attraction, onSelect }: AttractionCardP
         '&:hover': {
           backgroundColor: 'action.hover',
         },
+        position: 'relative',
       }}
     >
+      <FavoriteButton attractionId={attraction.id} onOpenAuthModal={onOpenAuthModal} />
+
       <ListItemAvatar sx={{ minWidth: 72 }}>
         <LazyImage
           src={

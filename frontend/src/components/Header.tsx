@@ -6,6 +6,7 @@ import { AttractionCategory } from '../types'
 import SearchBar from './SearchBar'
 import ViewToggle from './ViewToggle'
 import CategoryFilter from './CategoryFilter'
+import UserMenu from './UserMenu'
 
 interface HeaderProps {
   onMenuToggle: () => void
@@ -13,6 +14,8 @@ interface HeaderProps {
   onCategorySelect: (category: AttractionCategory | null) => void
   onViewModeChange: (mode: 'map' | 'list') => void
   viewMode: 'map' | 'list'
+  onOpenAuth: () => void
+  onOpenFavorites: () => void
 }
 
 export default function Header({
@@ -21,6 +24,8 @@ export default function Header({
   onCategorySelect,
   onViewModeChange,
   viewMode,
+  onOpenAuth,
+  onOpenFavorites,
 }: HeaderProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -80,6 +85,8 @@ export default function Header({
           onClose={handleClose}
           onCategorySelect={onCategorySelect}
         />
+
+        <UserMenu onLogin={onOpenAuth} onOpenFavorites={onOpenFavorites} />
       </Toolbar>
     </AppBar>
   )

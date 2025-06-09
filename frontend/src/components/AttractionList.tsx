@@ -7,13 +7,17 @@ import AttractionCard from './AttractionCard'
 import ListHeader from './ListHeader'
 import EmptyState from './EmptyState'
 
-interface AttractionsListProps {
+interface AttractionListProps {
   attractions: Attraction[]
   onSelectAttraction: (attraction: Attraction) => void
+  onOpenAuthModal?: () => void
 }
 
-export default function AttractionsList({ attractions, onSelectAttraction }: AttractionsListProps) {
-  // Estimate row height based on content
+export default function AttractionsList({
+  attractions,
+  onSelectAttraction,
+  onOpenAuthModal,
+}: AttractionListProps) {
   const estimateRowHeight = (attraction: Attraction) => {
     // Base height for card
     let height = 120
@@ -43,7 +47,6 @@ export default function AttractionsList({ attractions, onSelectAttraction }: Att
   const renderRow = ({ index, style }: { index: number; style: React.CSSProperties }) => {
     const attraction = attractions[index]
 
-    // Apply padding to the style
     const enhancedStyle = {
       ...style,
       padding: '4px 8px',
@@ -51,7 +54,12 @@ export default function AttractionsList({ attractions, onSelectAttraction }: Att
 
     return (
       <div style={enhancedStyle}>
-        <AttractionCard key={attraction.id} attraction={attraction} onSelect={onSelectAttraction} />
+        <AttractionCard
+          key={attraction.id}
+          attraction={attraction}
+          onSelect={onSelectAttraction}
+          onOpenAuthModal={onOpenAuthModal}
+        />
       </div>
     )
   }

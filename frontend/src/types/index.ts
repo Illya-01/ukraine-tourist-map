@@ -31,3 +31,18 @@ export interface MapState {
 export interface UserFavorites {
   [id: string]: boolean
 }
+
+export interface AuthUser {
+  id: string
+  email: string
+  name: string
+  role: 'user' | 'admin'
+  favorites: string[]
+}
+
+export interface AuthState {
+  user: AuthUser | null
+  isAuthenticated: boolean
+  loading: boolean
+  error: string | null
+}

@@ -5,7 +5,10 @@ import MapComponent from './components/Map'
 import Sidebar from './components/Sidebar'
 import AttractionsList from './components/AttractionList'
 import { Attraction, AttractionCategory } from './types'
-import { fetchAttractions } from './services/api'
+import { fetchAttractions } from './services/api.service'
+import { AuthProvider } from './contexts/AuthContext'
+import AuthModal from './components/AuthModal'
+import FavoritesDialog from './components/FavoritesDialog'
 
 const theme = createTheme({
   palette: {
@@ -29,6 +32,8 @@ function App() {
   const [snackbarMessage, setSnackbarMessage] = useState('')
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success')
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map')
+  const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [favoritesDialogOpen, setFavoritesDialogOpen] = useState(false)
 
   useEffect(() => {
     const loadAttractions = async () => {
@@ -86,6 +91,11 @@ function App() {
     }
   }
 
+  const handleOpenAuth = () => setAuthModalOpen(true)
+  const handleCloseAuth = () => setAuthModalOpen(false)
+  const handleOpenFavorites = () => setFavoritesDialogOpen(true)
+  const handleCloseFavorites = () => setFavoritesDialogOpen(false)
+
   const showSnackbar = (message: string, severity: 'success' | 'error') => {
     setSnackbarMessage(message)
     setSnackbarSeverity(severity)
@@ -102,51 +112,69 @@ function App() {
   })
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-        <Header
-          onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
-          onSearch={handleSearch}
-          onCategorySelect={handleCategorySelect}
-          onViewModeChange={handleViewModeChange}
-          viewMode={viewMode}
-        />
+    <AuthProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+          <Header
+            onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
+            onSearch={handleSearch}
+            onCategorySelect={handleCategorySelect}
+            onViewModeChange={handleViewModeChange}
+            viewMode={viewMode}
+            onOpenAuth={handleOpenAuth}
+            onOpenFavorites={handleOpenFavorites}
+          />
 
-        <Box component="main" sx={{ flexGrow: 1, position: 'relative' }}>
-          {viewMode === 'map' ? (
-            <MapComponent
-              attractions={filteredAttractions}
-              isLoading={isLoading}
-              onSelectAttraction={handleAttractionSelect}
-              onAddAttractions={handleAddAttractions}
-            />
-          ) : (
-            <AttractionsList
-              attractions={filteredAttractions}
-              onSelectAttraction={handleAttractionSelect}
-            />
-          )}
-        </Box>
+          <Box component="main" sx={{ flexGrow: 1, position: 'relative' }}>
+            {viewMode === 'map' ? (
+              <MapComponent
+                attractions={filteredAttractions}
+                isLoading={isLoading}
+                onSelectAttraction={handleAttractionSelect}
+                onAddAttractions={handleAddAttractions}
+                onOpenAuthModal={handleOpenAuth}
+              />
+            ) : (
+              <AttractionsList
+                attractions={filteredAttractions}
+                onSelectAttraction={handleAttractionSelect}
+                onOpenAuthModal={handleOpenAuth}
+              />
+            )}
+          </Box>
 
-        <Sidebar open={sidebarOpen} onClose={handleSidebarClose} attraction={selectedAttraction} />
+          <Sidebar
+            open={sidebarOpen}
+            onClose={handleSidebarClose}
+            attraction={selectedAttraction}
+          />
 
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={6000}
-          onClose={() => setSnackbarOpen(false)}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-        >
-          <Alert
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={6000}
             onClose={() => setSnackbarOpen(false)}
-            severity={snackbarSeverity}
-            sx={{ width: '100%' }}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
           >
-            {snackbarMessage}
-          </Alert>
-        </Snackbar>
-      </Box>
-    </ThemeProvider>
+            <Alert
+              onClose={() => setSnackbarOpen(false)}
+              severity={snackbarSeverity}
+              sx={{ width: '100%' }}
+            >
+              {snackbarMessage}
+            </Alert>
+          </Snackbar>
+
+          <AuthModal open={authModalOpen} onClose={handleCloseAuth} />
+
+          <FavoritesDialog
+            open={favoritesDialogOpen}
+            onClose={handleCloseFavorites}
+            onSelectAttraction={handleAttractionSelect}
+          />
+        </Box>
+      </ThemeProvider>
+    </AuthProvider>
   )
 }
 

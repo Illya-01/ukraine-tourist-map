@@ -1,0 +1,79 @@
+import React from 'react'
+import { IconButton, Tooltip } from '@mui/material'
+import FavoriteIcon from '@mui/icons-material/Favorite'
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
+import { useAuth } from '../contexts/AuthContext'
+
+interface FavoriteButtonProps {
+  attractionId: string
+  size?: 'small' | 'medium' | 'large'
+  position?: 'static' | 'absolute'
+  top?: number
+  right?: number
+  showTooltip?: boolean
+  onOpenAuthModal?: () => void
+}
+
+export default function FavoriteButton({
+  attractionId,
+  size = 'small',
+  position = 'absolute',
+  top = 8,
+  right = 8,
+  showTooltip = true,
+  onOpenAuthModal,
+}: FavoriteButtonProps) {
+  // Use try-catch for safer context access
+  let user = null
+  let isAuthenticated = false
+  let toggleFavorite = (_: string) => Promise.resolve()
+
+  try {
+    const auth = useAuth()
+    user = auth.user
+    isAuthenticated = auth.isAuthenticated
+    toggleFavorite = auth.toggleFavorite
+  } catch (error) {
+    console.error('Auth context not available:', error)
+  }
+
+  const isFavorite = user && user.favorites.includes(attractionId)
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+
+    if (isAuthenticated) {
+      toggleFavorite(attractionId)
+    } else if (onOpenAuthModal) {
+      onOpenAuthModal()
+    }
+  }
+
+  const button = (
+    <IconButton
+      size={size}
+      onClick={handleFavoriteClick}
+      sx={{
+        position: position,
+        top: position === 'absolute' ? top : undefined,
+        right: position === 'absolute' ? right : undefined,
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        '&:hover': {
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        },
+      }}
+    >
+      {isFavorite ? <FavoriteIcon color="error" /> : <FavoriteBorderIcon />}
+    </IconButton>
+  )
+
+  if (showTooltip) {
+    return (
+      <Tooltip title={isFavorite ? 'Видалити з улюблених' : 'Додати до улюблених'}>
+        {button}
+      </Tooltip>
+    )
+  }
+
+  return button
+}

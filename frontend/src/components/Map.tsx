@@ -7,16 +7,15 @@ import {
   MarkerClusterer,
 } from '@react-google-maps/api'
 import MyLocationIcon from '@mui/icons-material/MyLocation'
-import { Box, Typography, CircularProgress, Fab, Rating, IconButton } from '@mui/material'
+import { Box, Typography, CircularProgress, Fab } from '@mui/material'
 import ExploreIcon from '@mui/icons-material/Explore'
-import FavoriteIcon from '@mui/icons-material/Favorite'
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { Attraction, AttractionCategory, UserFavorites } from '../types'
 import MapLegend from './MapLegend'
-import { fetchNearbyAttractions } from '../services/api'
+import { fetchNearbyAttractions } from '../services/api.service'
 import StarRating from './StarRating'
 import LazyImage from './LazyImage'
 import { getImageUrl } from '../utils'
+import FavoriteButton from './FavoriteButton'
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
 
@@ -29,6 +28,7 @@ interface MapComponentProps {
   isLoading: boolean
   onSelectAttraction?: (attraction: Attraction) => void
   onAddAttractions?: (attractions: Attraction[]) => void
+  onOpenAuthModal?: () => void
 }
 
 const mapContainerStyle = {
@@ -41,14 +41,12 @@ const options = {
   zoomControl: true,
 }
 
-// Опції кластеризації
 const clusterOptions = {
   gridSize: 50,
   maxZoom: 15,
   minimumClusterSize: 3,
 }
 
-// Функція для отримання іконки маркера відповідно до категорії
 const getMarkerIcon = (category: AttractionCategory): string => {
   switch (category) {
     case AttractionCategory.HISTORICAL:
@@ -71,6 +69,7 @@ export default function MapComponent({
   isLoading,
   onSelectAttraction,
   onAddAttractions,
+  onOpenAuthModal,
 }: MapComponentProps) {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
@@ -172,15 +171,6 @@ export default function MapComponent({
     }
   }, [mapCenter, onAddAttractions])
 
-  const toggleFavorite = (attraction: Attraction) => {
-    const newFavorites = {
-      ...favorites,
-      [attraction.id]: !favorites[attraction.id],
-    }
-    setFavorites(newFavorites)
-    localStorage.setItem('favorites', JSON.stringify(newFavorites))
-  }
-
   if (loadError) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="100%">
@@ -240,7 +230,6 @@ export default function MapComponent({
                   fallbackSrc="img/default-image.png"
                 />
               )}
-
               <Box p={1} maxWidth={240}>
                 <Typography
                   variant="subtitle1"
@@ -262,20 +251,14 @@ export default function MapComponent({
                 )}
               </Box>
 
-              <IconButton
-                onClick={e => {
-                  e.stopPropagation()
-                  toggleFavorite(selectedAttraction)
-                }}
-                size="small"
-                sx={{ position: 'absolute', top: 5, right: 5 }}
-              >
-                {favorites[selectedAttraction.id] ? (
-                  <FavoriteIcon color="error" />
-                ) : (
-                  <FavoriteBorderIcon />
-                )}
-              </IconButton>
+              <FavoriteButton
+                attractionId={selectedAttraction.id}
+                position="absolute"
+                top={5}
+                right={5}
+                onOpenAuthModal={onOpenAuthModal}
+                size="medium"
+              />
             </Box>
           </InfoWindow>
         )}

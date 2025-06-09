@@ -45,6 +45,11 @@ const mockAttractions: Attraction[] = [
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
 
+const getAuthHeaders = (): Record<string, string> => {
+  const token = localStorage.getItem('token')
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
 export const fetchAttractions = async (category?: AttractionCategory): Promise<Attraction[]> => {
   try {
     let url = `${API_BASE_URL}/attractions`
@@ -54,7 +59,9 @@ export const fetchAttractions = async (category?: AttractionCategory): Promise<A
       url += `?category=${category}`
     }
 
-    const response = await fetch(url)
+    const response = await fetch(url, {
+      headers: getAuthHeaders(),
+    })
 
     if (!response.ok) {
       throw new Error(`API request failed with status ${response.status}`)

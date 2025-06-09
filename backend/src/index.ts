@@ -4,6 +4,7 @@ import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import { connectToDatabase } from './utils/db'
 import attractionRoutes from './routes/attractionRoutes'
+import authRoutes from './routes/authRoutes'
 import config from './config'
 
 const app = express()
@@ -28,6 +29,7 @@ const limiter = rateLimit({
 app.use(limiter)
 
 app.use('/api/attractions', attractionRoutes)
+app.use('/api/auth', authRoutes)
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' })
