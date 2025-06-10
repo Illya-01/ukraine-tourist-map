@@ -12,26 +12,13 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import LoginIcon from '@mui/icons-material/Login'
 import LogoutIcon from '@mui/icons-material/Logout'
 import FavoriteIcon from '@mui/icons-material/Favorite'
-import { useAuth } from '../contexts/AuthContext'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { logout } from '../../store/slices/authSlice'
+import { toggleAuthModal, toggleFavoritesDialog } from '../../store/slices/uiSlice'
 
-interface UserMenuProps {
-  onLogin: () => void
-  onOpenFavorites: () => void
-}
-
-const UserMenu: React.FC<UserMenuProps> = ({ onLogin, onOpenFavorites }) => {
-  let user = null
-  let isAuthenticated = false
-  let logout = () => {}
-
-  try {
-    const auth = useAuth()
-    user = auth.user
-    isAuthenticated = auth.isAuthenticated
-    logout = auth.logout
-  } catch (e) {
-    console.error('Auth context not available', e)
-  }
+const UserMenu: React.FC = () => {
+  const dispatch = useAppDispatch()
+  const { user, isAuthenticated } = useAppSelector(state => state.auth)
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -45,21 +32,21 @@ const UserMenu: React.FC<UserMenuProps> = ({ onLogin, onOpenFavorites }) => {
   }
 
   const handleLogout = () => {
-    logout()
+    dispatch(logout())
     handleClose()
   }
 
   const handleLoginClick = () => {
     handleClose()
-    onLogin()
+    dispatch(toggleAuthModal(true))
   }
 
   const handleFavoritesClick = () => {
     handleClose()
-    onOpenFavorites()
+    dispatch(toggleFavoritesDialog(true))
   }
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string = '') => {
     return (
       name
         ?.split(' ')

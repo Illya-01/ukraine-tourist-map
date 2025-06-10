@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Box,
   Button,
@@ -9,14 +9,18 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material'
-import { useAuth } from '../contexts/AuthContext'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { register, clearError } from '../../store/slices/authSlice'
+import { toggleAuthModal } from '../../store/slices/uiSlice'
 
 interface RegisterProps {
   onSwitchToLogin: () => void
-  onRegisterSuccess?: () => void
 }
 
-const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegisterSuccess }) => {
+const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
+  const dispatch = useAppDispatch()
+  const { loading, error, isAuthenticated } = useAppSelector(state => state.auth)
+
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -28,26 +32,12 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegisterSuccess 
     confirmPassword?: string
   }>({})
 
-  let register: (email: string, password: string, name: string) => Promise<void> = async (
-    _email,
-    _password,
-    _name
-  ) => {
-    throw new Error('Auth context not available')
-  }
-  let loading = false
-  let error: string | null = null
-  let clearError = () => {}
-
-  try {
-    const auth = useAuth()
-    register = auth.register
-    loading = auth.loading
-    error = auth.error
-    clearError = auth.clearError
-  } catch (e) {
-    console.error('Auth context not available', e)
-  }
+  // Close modal if registration was successful
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(toggleAuthModal(false))
+    }
+  }, [isAuthenticated, dispatch])
 
   const validateForm = (): boolean => {
     const errors: {
@@ -90,21 +80,11 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegisterSuccess 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (clearError) clearError()
+    dispatch(clearError())
 
     if (!validateForm()) return
 
-    try {
-      await register(email, password, name)
-      // Only call onRegisterSuccess if registration was successful
-      if (onRegisterSuccess) {
-        onRegisterSuccess()
-      }
-    } catch (error) {
-      // If registration fails, we do nothing, so the modal stays open with error message
-      console.error('Registration failed:', error)
-      // Don't call onRegisterSuccess here
-    }
+    dispatch(register({ email, password, name }))
   }
 
   return (

@@ -9,13 +9,13 @@ import {
 import MyLocationIcon from '@mui/icons-material/MyLocation'
 import { Box, Typography, CircularProgress, Fab } from '@mui/material'
 import ExploreIcon from '@mui/icons-material/Explore'
-import { Attraction, AttractionCategory, UserFavorites } from '../types'
+import { Attraction, AttractionCategory, UserFavorites } from '../../types'
 import MapLegend from './MapLegend'
-import { fetchNearbyAttractions } from '../services/api.service'
-import StarRating from './StarRating'
-import LazyImage from './LazyImage'
-import { getImageUrl } from '../utils'
-import FavoriteButton from './FavoriteButton'
+import { fetchNearbyAttractions } from '../../services/api.service'
+import StarRating from '../common/StarRating'
+import LazyImage from '../common/LazyImage'
+import { getImageUrl } from '../../utils'
+import FavoriteButton from '../attractions/FavoriteButton'
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
 
@@ -29,6 +29,7 @@ interface MapComponentProps {
   onSelectAttraction?: (attraction: Attraction) => void
   onAddAttractions?: (attractions: Attraction[]) => void
   onOpenAuthModal?: () => void
+  showNotification?: (message: string, severity: 'success' | 'error') => void
 }
 
 const mapContainerStyle = {
@@ -70,6 +71,7 @@ export default function MapComponent({
   onSelectAttraction,
   onAddAttractions,
   onOpenAuthModal,
+  showNotification,
 }: MapComponentProps) {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
@@ -81,6 +83,18 @@ export default function MapComponent({
   const [userLocation, setUserLocation] = useState<null | { lat: number; lng: number }>(null)
   const [favorites, setFavorites] = useState<UserFavorites>({})
   const mapRef = useRef<google.maps.Map | null>(null)
+
+  // Helper function to display notifications
+  const notify = useCallback(
+    (message: string, severity: 'success' | 'error') => {
+      if (showNotification) {
+        showNotification(message, severity)
+      } else {
+        console.error(message)
+      }
+    },
+    [showNotification]
+  )
 
   const handleGetUserLocation = () => {
     if (navigator.geolocation) {
@@ -97,11 +111,11 @@ export default function MapComponent({
           }
         },
         () => {
-          alert('Не вдалося отримати ваше місцезнаходження')
+          notify('Не вдалося отримати ваше місцезнаходження', 'error')
         }
       )
     } else {
-      alert('Геолокація не підтримується вашим браузером')
+      notify('Геолокація не підтримується вашим браузером', 'error')
     }
   }
 
@@ -115,12 +129,9 @@ export default function MapComponent({
   useEffect(() => {
     if (loadError) {
       console.error('Error loading Google Maps API:', loadError)
-      showSnackbar(
-        "Не вдалося завантажити Google Maps. Перевірте ваше з'єднання з Інтернетом.",
-        'error'
-      )
+      notify("Не вдалося завантажити Google Maps. Перевірте ваше з'єднання з Інтернетом.", 'error')
     }
-  }, [loadError])
+  }, [loadError, notify])
 
   const handleMarkerClick = useCallback(
     (attraction: Attraction) => {
@@ -160,16 +171,20 @@ export default function MapComponent({
       const nearbyAttractions = await fetchNearbyAttractions(mapCenter.lat, mapCenter.lng, 15000)
       if (nearbyAttractions.length > 0) {
         onAddAttractions(nearbyAttractions)
+        notify(`Знайдено ${nearbyAttractions.length} пам'яток поблизу`, 'success')
       } else {
-        alert("Пам'яток поблизу не знайдено. Спробуйте змінити масштаб або перемістити карту.")
+        notify(
+          "Пам'яток поблизу не знайдено. Спробуйте змінити масштаб або перемістити карту.",
+          'error'
+        )
       }
     } catch (error) {
       console.error("Помилка отримання пам'яток поблизу:", error)
-      alert("Не вдалося отримати пам'ятки поблизу. Будь ласка, спробуйте ще раз.")
+      notify("Не вдалося отримати пам'ятки поблизу. Будь ласка, спробуйте ще раз.", 'error')
     } finally {
       setLoadingNearby(false)
     }
-  }, [mapCenter, onAddAttractions])
+  }, [mapCenter, onAddAttractions, notify])
 
   if (loadError) {
     return (
@@ -286,7 +301,4 @@ export default function MapComponent({
       </Fab>
     </Box>
   )
-}
-function showSnackbar(arg0: string, arg1: string) {
-  throw new Error('Function not implemented.')
 }

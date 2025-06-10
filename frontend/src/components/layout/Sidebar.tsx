@@ -1,9 +1,9 @@
 import { Box, Typography, Drawer, IconButton, Rating, Divider } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
-import { Attraction } from '../types'
-import LazyImage from './LazyImage'
-import { getImageUrl } from '../utils'
+import { Attraction } from '../../types'
+import LazyImage from '../common/LazyImage'
+import { getImageUrl } from '../../utils'
 
 interface SidebarProps {
   open: boolean

@@ -15,23 +15,36 @@ import {
 } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import CloseIcon from '@mui/icons-material/Close'
-import { useAuth } from '../contexts/AuthContext'
-import { Attraction } from '../types'
-import { fetchAttractionById } from '../services/api.service'
-import LazyImage from './LazyImage'
-import { getImageUrl } from '../utils'
+import { Attraction } from '../../types'
+import { fetchAttractionById } from '../../services/api.service'
+import LazyImage from '../common/LazyImage'
+import { getImageUrl } from '../../utils'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { toggleFavorite } from '../../store/slices/authSlice'
+import { toggleFavoritesDialog, openSidebar } from '../../store/slices/uiSlice'
+import { setSelectedAttraction } from '../../store/slices/attractionSlice'
 
 interface FavoritesDialogProps {
   open: boolean
-  onClose: () => void
-  onSelectAttraction: (attraction: Attraction) => void
 }
 
-const FavoritesDialog: React.FC<FavoritesDialogProps> = ({ open, onClose, onSelectAttraction }) => {
-  const { user, toggleFavorite } = useAuth()
+const FavoritesDialog: React.FC<FavoritesDialogProps> = ({ open }) => {
+  const dispatch = useAppDispatch()
+  const { user } = useAppSelector(state => state.auth)
+
   const [favorites, setFavorites] = useState<Attraction[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const onClose = () => {
+    dispatch(toggleFavoritesDialog(false))
+  }
+
+  const handleSelectAttraction = (attraction: Attraction) => {
+    dispatch(setSelectedAttraction(attraction))
+    dispatch(openSidebar())
+    onClose()
+  }
 
   useEffect(() => {
     if (open && user) {
@@ -55,7 +68,7 @@ const FavoritesDialog: React.FC<FavoritesDialogProps> = ({ open, onClose, onSele
 
   const handleRemove = async (attractionId: string) => {
     try {
-      await toggleFavorite(attractionId)
+      await dispatch(toggleFavorite(attractionId))
       setFavorites(favorites.filter(fav => fav.id !== attractionId))
     } catch (err) {
       setError("Не вдалося видалити пам'ятку з улюблених")
@@ -63,8 +76,7 @@ const FavoritesDialog: React.FC<FavoritesDialogProps> = ({ open, onClose, onSele
   }
 
   const handleSelect = (attraction: Attraction) => {
-    onSelectAttraction(attraction)
-    onClose()
+    handleSelectAttraction(attraction)
   }
 
   return (

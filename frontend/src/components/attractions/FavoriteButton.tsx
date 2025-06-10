@@ -2,7 +2,9 @@ import React from 'react'
 import { IconButton, Tooltip } from '@mui/material'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
-import { useAuth } from '../contexts/AuthContext'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { toggleFavorite } from '../../store/slices/authSlice'
+import { toggleAuthModal } from '../../store/slices/uiSlice'
 
 interface FavoriteButtonProps {
   attractionId: string
@@ -23,29 +25,22 @@ export default function FavoriteButton({
   showTooltip = true,
   onOpenAuthModal,
 }: FavoriteButtonProps) {
-  // Use try-catch for safer context access
-  let user = null
-  let isAuthenticated = false
-  let toggleFavorite = (_: string) => Promise.resolve()
+  const dispatch = useAppDispatch()
+  const { user, isAuthenticated } = useAppSelector(state => state.auth)
 
-  try {
-    const auth = useAuth()
-    user = auth.user
-    isAuthenticated = auth.isAuthenticated
-    toggleFavorite = auth.toggleFavorite
-  } catch (error) {
-    console.error('Auth context not available:', error)
-  }
-
-  const isFavorite = user && user.favorites.includes(attractionId)
+  const isFavorite = user?.favorites.includes(attractionId) || false
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation()
 
     if (isAuthenticated) {
-      toggleFavorite(attractionId)
-    } else if (onOpenAuthModal) {
-      onOpenAuthModal()
+      dispatch(toggleFavorite(attractionId))
+    } else {
+      if (onOpenAuthModal) {
+        onOpenAuthModal()
+      } else {
+        dispatch(toggleAuthModal(true))
+      }
     }
   }
 

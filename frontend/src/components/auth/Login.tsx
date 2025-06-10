@@ -9,35 +9,28 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material'
-import { useAuth } from '../contexts/AuthContext'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { login, clearError } from '../../store/slices/authSlice'
+import { toggleAuthModal } from '../../store/slices/uiSlice'
 
 interface LoginProps {
   onSwitchToRegister: () => void
-  onLoginSuccess?: () => void
 }
 
-const Login: React.FC<LoginProps> = ({ onSwitchToRegister, onLoginSuccess }) => {
+const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
+  const dispatch = useAppDispatch()
+  const { loading, error, isAuthenticated } = useAppSelector(state => state.auth)
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [formErrors, setFormErrors] = useState<{ email?: string; password?: string }>({})
 
-  // Use try-catch to handle potential context errors
-  let login: (email: string, password: string) => Promise<void> = async (_email, _password) => {
-    throw new Error('Auth context not available')
-  }
-  let loading = false
-  let error: string | null = null
-  let clearError = () => {}
-
-  try {
-    const auth = useAuth()
-    login = auth.login
-    loading = auth.loading
-    error = auth.error
-    clearError = auth.clearError
-  } catch (e) {
-    console.error('Auth context not available', e)
-  }
+  // Close modal if login was successful
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(toggleAuthModal(false))
+    }
+  }, [isAuthenticated, dispatch])
 
   const validateForm = (): boolean => {
     const errors: { email?: string; password?: string } = {}
@@ -62,18 +55,11 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister, onLoginSuccess }) => 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (clearError) clearError()
+    dispatch(clearError())
 
     if (!validateForm()) return
 
-    try {
-      await login(email, password)
-      if (onLoginSuccess) {
-        onLoginSuccess()
-      }
-    } catch (error) {
-      console.error('Login failed:', error)
-    }
+    dispatch(login({ email, password }))
   }
 
   return (

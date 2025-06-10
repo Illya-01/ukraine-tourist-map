@@ -1,8 +1,8 @@
 import { ListItemButton, ListItemAvatar, Box, Typography, Chip } from '@mui/material'
-import { Attraction } from '../types'
-import StarRating from './StarRating'
-import LazyImage from './LazyImage'
-import { getImageUrl, getCategoryName, getCategoryColor } from '../utils'
+import { Attraction } from '../../types'
+import StarRating from '../common/StarRating'
+import LazyImage from '../common/LazyImage'
+import { getImageUrl, getCategoryName, getCategoryColor } from '../../utils'
 import FavoriteButton from './FavoriteButton'
 
 interface AttractionCardProps {

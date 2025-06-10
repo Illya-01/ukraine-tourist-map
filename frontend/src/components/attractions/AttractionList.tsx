@@ -2,10 +2,10 @@ import { Paper } from '@mui/material'
 import { FixedSizeList as VirtualList } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import SearchOffIcon from '@mui/icons-material/SearchOff'
-import { Attraction } from '../types'
+import { Attraction } from '../../types'
 import AttractionCard from './AttractionCard'
-import ListHeader from './ListHeader'
-import EmptyState from './EmptyState'
+import ListHeader from '../ui/ListHeader'
+import EmptyState from '../common/EmptyState'
 
 interface AttractionListProps {
   attractions: Attraction[]
@@ -20,7 +20,7 @@ export default function AttractionsList({
 }: AttractionListProps) {
   const estimateRowHeight = (attraction: Attraction) => {
     // Base height for card
-    let height = 120
+    let height = 130
 
     // Add height for longer descriptions
     if (attraction.description.length > 80) {
