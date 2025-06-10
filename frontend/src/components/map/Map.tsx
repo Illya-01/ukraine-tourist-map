@@ -11,13 +11,12 @@ import { Box, Typography, CircularProgress, Fab } from '@mui/material'
 import ExploreIcon from '@mui/icons-material/Explore'
 import { Attraction, AttractionCategory, UserFavorites } from '../../types'
 import MapLegend from './MapLegend'
-import { fetchNearbyAttractions } from '../../services/api.service'
+import { fetchNearbyAttractions } from '../../services/attraction.service'
 import StarRating from '../common/StarRating'
 import LazyImage from '../common/LazyImage'
 import { getImageUrl } from '../../utils'
 import FavoriteButton from '../attractions/FavoriteButton'
-
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
+import config from '../../config'
 
 // Координати центру України
 const DEFAULT_CENTER = { lat: 49.0, lng: 31.0 }
@@ -74,7 +73,7 @@ export default function MapComponent({
   showNotification,
 }: MapComponentProps) {
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    googleMapsApiKey: config.GOOGLE_MAPS_API_KEY,
   })
 
   const [selectedAttraction, setSelectedAttraction] = useState<Attraction | null>(null)

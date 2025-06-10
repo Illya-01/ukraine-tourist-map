@@ -4,6 +4,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn'
 import { Attraction } from '../../types'
 import LazyImage from '../common/LazyImage'
 import { getImageUrl } from '../../utils'
+import ReviewList from '../reviews/ReviewList'
 
 interface SidebarProps {
   open: boolean
@@ -16,7 +17,6 @@ export default function Sidebar({ open, onClose, attraction }: SidebarProps) {
     return null
   }
 
-  // Функція для отримання назви категорії українською
   const getCategoryName = (category: string): string => {
     const categories: Record<string, string> = {
       historical: 'Історична',
@@ -34,7 +34,7 @@ export default function Sidebar({ open, onClose, attraction }: SidebarProps) {
       open={open}
       onClose={onClose}
       PaperProps={{
-        sx: { width: { xs: '100%', sm: 400 } },
+        sx: { width: { xs: '100%', sm: 400 }, overflow: 'auto' },
       }}
     >
       <Box p={2}>
@@ -84,6 +84,8 @@ export default function Sidebar({ open, onClose, attraction }: SidebarProps) {
         <Typography variant="subtitle2" color="primary" mt={2}>
           Категорія: {getCategoryName(attraction.category)}
         </Typography>
+
+        {attraction.id && <ReviewList attractionId={attraction.id} />}
       </Box>
     </Drawer>
   )

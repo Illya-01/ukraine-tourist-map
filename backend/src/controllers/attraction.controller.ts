@@ -1,9 +1,8 @@
 import { Request, Response } from 'express'
 import Attraction, { IAttraction } from '../models/Attraction'
-import googlePlacesService from '../services/googlePlacesService'
+import googlePlacesService from '../services/googlePlaces.service'
 import { AttractionCategory } from '../types'
 
-// Helper function to determine category based on types
 const determineCategoryFromTypes = (types: string[]): AttractionCategory => {
   if (types.includes('church') || types.includes('place_of_worship')) {
     return AttractionCategory.RELIGIOUS
@@ -26,7 +25,7 @@ const determineCategoryFromTypes = (types: string[]): AttractionCategory => {
   ) {
     return AttractionCategory.NATURAL
   } else {
-    return AttractionCategory.HISTORICAL // Default for historic sites/monuments
+    return AttractionCategory.HISTORICAL // Default for historic sites
   }
 }
 
@@ -154,7 +153,6 @@ export const importFromGooglePlaces = async (req: Request, res: Response) => {
     // Determine category based on place types
     const category = determineCategoryFromTypes(placeDetails.types)
 
-    // Create a new attraction
     const newAttraction: Partial<IAttraction> = {
       name: placeDetails.name,
       description:
@@ -185,5 +183,32 @@ export const importFromGooglePlaces = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error importing from Google Places:', error)
     res.status(500).json({ message: 'Failed to import from Google Places' })
+  }
+}
+
+export const getAttractionReviews = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+
+    const attraction = await Attraction.findById(id)
+
+    if (!attraction) {
+      res.status(404).json({ message: 'Attraction not found' })
+      return
+    }
+
+    if (!attraction.googlePlaceId) {
+      res.status(400).json({ message: 'No Google Place ID available for this attraction' })
+      return
+    }
+
+    const placeDetails = await googlePlacesService.getPlaceDetails(attraction.googlePlaceId)
+
+    const reviews = await googlePlacesService.getPlaceReviews(attraction.googlePlaceId)
+
+    res.json({ reviews })
+  } catch (error) {
+    console.error('Error getting attraction reviews:', error)
+    res.status(500).json({ message: 'Failed to get attraction reviews' })
   }
 }

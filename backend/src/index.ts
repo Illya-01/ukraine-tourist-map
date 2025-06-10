@@ -3,8 +3,9 @@ import cors from 'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import { connectToDatabase } from './utils/db'
-import attractionRoutes from './routes/attractionRoutes'
-import authRoutes from './routes/authRoutes'
+import attractionRoutes from './routes/attraction.routes'
+import reviewRoutes from './routes/review.routes'
+import authRoutes from './routes/auth.routes'
 import config from './config'
 
 const app = express()
@@ -29,6 +30,7 @@ const limiter = rateLimit({
 app.use(limiter)
 
 app.use('/api/attractions', attractionRoutes)
+app.use('/api/reviews', reviewRoutes)
 app.use('/api/auth', authRoutes)
 
 app.get('/health', (req, res) => {

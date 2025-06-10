@@ -16,7 +16,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete'
 import CloseIcon from '@mui/icons-material/Close'
 import { Attraction } from '../../types'
-import { fetchAttractionById } from '../../services/api.service'
+import { fetchAttractionById } from '../../services/attraction.service'
 import LazyImage from '../common/LazyImage'
 import { getImageUrl } from '../../utils'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'

@@ -68,6 +68,9 @@ class GooglePlacesService {
             'rating',
             'opening_hours',
             'editorial_summary',
+            'reviews',
+            'user_ratings_total',
+            'types',
           ],
           language: Language.uk,
           key: config.googleMapsApiKey,
@@ -129,6 +132,28 @@ class GooglePlacesService {
       }))
     } catch (error) {
       console.error('Error getting nearby attractions:', error)
+      throw error
+    }
+  }
+
+  async getPlaceReviews(placeId: string): Promise<any[]> {
+    try {
+      const response = await this.client.placeDetails({
+        params: {
+          place_id: placeId,
+          fields: ['reviews', 'rating', 'user_ratings_total'],
+          language: Language.uk,
+          key: config.googleMapsApiKey,
+        },
+      })
+
+      if (response.data.status !== 'OK') {
+        throw new Error(`Google Places API error: ${response.data.status}`)
+      }
+
+      return response.data.result?.reviews || []
+    } catch (error) {
+      console.error('Error getting place reviews:', error)
       throw error
     }
   }

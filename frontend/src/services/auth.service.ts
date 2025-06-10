@@ -1,15 +1,13 @@
 import { AuthUser } from '../types'
+import config from '../config'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
-
-// Register a new user
 export const register = async (
   email: string,
   password: string,
   name: string
 ): Promise<{ user: AuthUser; token: string }> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    const response = await fetch(`${config.API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -34,13 +32,12 @@ export const register = async (
   }
 }
 
-// Login user
 export const login = async (
   email: string,
   password: string
 ): Promise<{ user: AuthUser; token: string }> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    const response = await fetch(`${config.API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -70,7 +67,6 @@ export const logout = (): void => {
   localStorage.removeItem('token')
 }
 
-// Get current user
 export const getCurrentUser = async (): Promise<AuthUser> => {
   try {
     const token = localStorage.getItem('token')
@@ -79,7 +75,7 @@ export const getCurrentUser = async (): Promise<AuthUser> => {
       throw new Error('No authentication token found')
     }
 
-    const response = await fetch(`${API_BASE_URL}/auth/me`, {
+    const response = await fetch(`${config.API_BASE_URL}/auth/me`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -96,7 +92,6 @@ export const getCurrentUser = async (): Promise<AuthUser> => {
   }
 }
 
-// Toggle attraction favorite status
 export const toggleFavorite = async (attractionId: string): Promise<string[]> => {
   try {
     const token = localStorage.getItem('token')
@@ -105,7 +100,7 @@ export const toggleFavorite = async (attractionId: string): Promise<string[]> =>
       throw new Error('Not authenticated')
     }
 
-    const response = await fetch(`${API_BASE_URL}/auth/favorites`, {
+    const response = await fetch(`${config.API_BASE_URL}/auth/favorites`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

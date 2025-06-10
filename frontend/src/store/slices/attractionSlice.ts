@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { Attraction, AttractionCategory } from '../../types'
-import { fetchAttractions } from '../../services/api.service'
+import { fetchAttractions } from '../../services/attraction.service'
 
 interface AttractionState {
   attractions: Attraction[]

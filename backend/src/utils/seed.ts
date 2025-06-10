@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 import Attraction from '../models/Attraction'
 import { AttractionCategory } from '../types'
 import { connectToDatabase } from './db'
-import googlePlacesService from '../services/googlePlacesService'
+import googlePlacesService from '../services/googlePlaces.service'
 
 // Регіони України для кращого покриття
 const ukraineRegions = [

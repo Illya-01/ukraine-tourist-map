@@ -8,6 +8,7 @@ export interface IUser extends Document {
   email: string
   password: string
   name: string
+  photo?: string
   favorites: string[] // Array of attraction IDs
   role: 'user' | 'admin'
   createdAt: Date
@@ -36,6 +37,10 @@ const UserSchema: Schema = new Schema(
       type: String,
       required: [true, 'Name is required'],
       trim: true,
+    },
+    photo: {
+      type: String,
+      default: null,
     },
     favorites: {
       type: [String],

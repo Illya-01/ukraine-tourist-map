@@ -10,6 +10,35 @@ export interface Attraction {
   images: string[]
   rating?: number
   address: string
+  googlePlaceId?: string
+}
+
+export interface Review {
+  _id: string
+  attraction: string
+  user?:
+    | string
+    | {
+        _id: string
+        name: string
+        photo?: string | null
+      }
+  userName: string
+  userPhotoUrl?: string
+  rating: number
+  text: string
+  date: string
+  source: 'google' | 'user'
+  googleReviewId?: string
+  language?: string
+  googleProfileUrl?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface NewReview {
+  rating: number
+  text: string
 }
 
 export enum AttractionCategory {
@@ -38,6 +67,7 @@ export interface AuthUser {
   name: string
   role: 'user' | 'admin'
   favorites: string[]
+  photo?: string
 }
 
 export interface AuthState {

@@ -13,6 +13,7 @@ declare global {
         name: string
         role: string
         favorites: string[]
+        photo?: string
       }
     }
   }
@@ -35,13 +36,13 @@ export const authenticateUser = async (req: Request, res: Response, next: NextFu
       res.status(401).json({ message: 'User not found' })
       return
     }
-
     req.user = {
       id: user._id.toString(),
       email: user.email,
       name: user.name,
       role: user.role,
       favorites: user.favorites,
+      photo: user.photo,
     }
 
     next()

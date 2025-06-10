@@ -101,7 +101,7 @@ export const fetchCurrentUser = createAsyncThunk(
 
 export const toggleFavorite = createAsyncThunk(
   'auth/toggleFavorite',
-  async (attractionId: string, { rejectWithValue, getState }) => {
+  async (attractionId: string, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token')
       if (!token) {
