@@ -9,7 +9,7 @@ export const getAttractionReviews = async (req: Request, res: Response) => {
     const { attractionId } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(attractionId)) {
-      res.status(400).json({ message: 'Invalid attraction ID' })
+      res.status(400).json({ message: 'Неправильний ID визначного місця' })
       return
     }
 
@@ -17,14 +17,14 @@ export const getAttractionReviews = async (req: Request, res: Response) => {
     res.json(reviews)
   } catch (error) {
     console.error('Error fetching reviews:', error)
-    res.status(500).json({ message: 'Failed to fetch reviews' })
+    res.status(500).json({ message: 'Помилка при отриманні відгуків' })
   }
 }
 
 export const addReview = async (req: Request, res: Response) => {
   try {
     if (!req.user) {
-      res.status(401).json({ message: 'Authentication required' })
+      res.status(401).json({ message: 'Потрібна автентифікація' })
       return
     }
 
@@ -32,13 +32,13 @@ export const addReview = async (req: Request, res: Response) => {
     const { rating, text } = req.body
 
     if (!mongoose.Types.ObjectId.isValid(attractionId)) {
-      res.status(400).json({ message: 'Invalid attraction ID' })
+      res.status(400).json({ message: 'Неправильний ID визначного місця' })
       return
     }
 
     const attraction = await Attraction.findById(attractionId)
     if (!attraction) {
-      res.status(404).json({ message: 'Attraction not found' })
+      res.status(404).json({ message: 'Визначне місце не знайдено' })
       return
     }
 
@@ -49,7 +49,7 @@ export const addReview = async (req: Request, res: Response) => {
     })
 
     if (existingReview) {
-      res.status(400).json({ message: 'You have already reviewed this attraction' })
+      res.status(400).json({ message: 'Ви вже зробили відгук на це визначне місце' })
       return
     }
     const review = new Review({
@@ -70,14 +70,14 @@ export const addReview = async (req: Request, res: Response) => {
     res.status(201).json(review)
   } catch (error) {
     console.error('Error adding review:', error)
-    res.status(500).json({ message: 'Failed to add review' })
+    res.status(500).json({ message: 'Не вдалося додати відгук' })
   }
 }
 
 export const updateReview = async (req: Request, res: Response) => {
   try {
     if (!req.user) {
-      res.status(401).json({ message: 'Authentication required' })
+      res.status(401).json({ message: 'Потрібна автентифікація' })
       return
     }
 
@@ -85,19 +85,19 @@ export const updateReview = async (req: Request, res: Response) => {
     const { rating, text } = req.body
 
     if (!mongoose.Types.ObjectId.isValid(reviewId)) {
-      res.status(400).json({ message: 'Invalid review ID' })
+      res.status(400).json({ message: 'Неправильне ID відгука' })
       return
     }
 
     const review = await Review.findById(reviewId)
 
     if (!review) {
-      res.status(404).json({ message: 'Review not found' })
+      res.status(404).json({ message: 'Відгук не знайдено' })
       return
     }
 
     if (review.source !== 'user' || review.user?.toString() !== req.user.id) {
-      res.status(403).json({ message: 'Unauthorized: Cannot edit this review' })
+      res.status(403).json({ message: 'Ви неавторизовані: Не можете редагувати цей відгук' })
       return
     }
 
@@ -110,33 +110,33 @@ export const updateReview = async (req: Request, res: Response) => {
     res.json(review)
   } catch (error) {
     console.error('Error updating review:', error)
-    res.status(500).json({ message: 'Failed to update review' })
+    res.status(500).json({ message: 'Не вдалося оновити відгук' })
   }
 }
 
 export const deleteReview = async (req: Request, res: Response) => {
   try {
     if (!req.user) {
-      res.status(401).json({ message: 'Authentication required' })
+      res.status(401).json({ message: 'Потрібна автентифікація' })
       return
     }
 
     const { reviewId } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(reviewId)) {
-      res.status(400).json({ message: 'Invalid review ID' })
+      res.status(400).json({ message: 'Неправильне ID відгука' })
       return
     }
 
     const review = await Review.findById(reviewId)
 
     if (!review) {
-      res.status(404).json({ message: 'Review not found' })
+      res.status(404).json({ message: 'Відгук не знайдено' })
       return
     }
 
     if (review.source !== 'user' || review.user?.toString() !== req.user.id) {
-      res.status(403).json({ message: 'Unauthorized: Cannot delete this review' })
+      res.status(403).json({ message: 'Ви неавторизовані: Не можете видалити цей відгук' })
       return
     }
 
@@ -145,10 +145,10 @@ export const deleteReview = async (req: Request, res: Response) => {
 
     await updateAttractionRating(attractionId)
 
-    res.json({ message: 'Review deleted successfully' })
+    res.json({ message: 'Відгук видалено вдало' })
   } catch (error) {
     console.error('Error deleting review:', error)
-    res.status(500).json({ message: 'Failed to delete review' })
+    res.status(500).json({ message: 'Не вдалося видалити відгук' })
   }
 }
 

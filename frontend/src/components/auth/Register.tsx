@@ -91,7 +91,7 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
     <Paper
       elevation={3}
       sx={{
-        p: 3,
+        p: { xs: 2, sm: 3 },
         maxWidth: 400,
         width: '100%',
         boxSizing: 'border-box',
@@ -108,9 +108,18 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
         </Alert>
       )}
 
-      <Box component="form" onSubmit={handleSubmit} noValidate>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        noValidate
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+        }}
+      >
         <TextField
-          margin="normal"
+          margin="dense"
           required
           fullWidth
           id="name"
@@ -123,9 +132,11 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
           error={!!formErrors.name}
           helperText={formErrors.name}
           disabled={loading}
+          size="small"
+          FormHelperTextProps={{ sx: { mx: 0 } }}
         />
         <TextField
-          margin="normal"
+          margin="dense"
           required
           fullWidth
           id="email"
@@ -137,9 +148,11 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
           error={!!formErrors.email}
           helperText={formErrors.email}
           disabled={loading}
+          size="small"
+          FormHelperTextProps={{ sx: { mx: 0 } }}
         />
         <TextField
-          margin="normal"
+          margin="dense"
           required
           fullWidth
           name="password"
@@ -152,9 +165,11 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
           error={!!formErrors.password}
           helperText={formErrors.password}
           disabled={loading}
+          size="small"
+          FormHelperTextProps={{ sx: { mx: 0 } }}
         />
         <TextField
-          margin="normal"
+          margin="dense"
           required
           fullWidth
           name="confirmPassword"
@@ -166,12 +181,14 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
           error={!!formErrors.confirmPassword}
           helperText={formErrors.confirmPassword}
           disabled={loading}
+          size="small"
+          FormHelperTextProps={{ sx: { mx: 0 } }}
         />
         <Button
           type="submit"
           fullWidth
           variant="contained"
-          sx={{ mt: 3, mb: 2 }}
+          sx={{ mt: 2, mb: 1 }}
           disabled={loading}
         >
           {loading ? <CircularProgress size={24} /> : 'Зареєструватися'}
@@ -181,7 +198,7 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
       <Box
         textAlign="center"
         sx={{
-          mt: 2,
+          mt: 1,
           width: '100%',
           display: 'flex',
           flexDirection: { xs: 'column', sm: 'row' },

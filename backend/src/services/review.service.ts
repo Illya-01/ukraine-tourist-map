@@ -18,7 +18,9 @@ export const fetchAndStoreGoogleReviews = async (attractionId: string): Promise<
       return []
     }
 
-    console.log(`Found ${placeDetails.reviews.length} Google reviews for ${attraction.name}`)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Found ${placeDetails.reviews.length} reviews for ${attraction.name}`)
+    }
 
     const operations = placeDetails.reviews.map(async (googleReview: any) => {
       try {
@@ -55,7 +57,10 @@ export const fetchAndStoreGoogleReviews = async (attractionId: string): Promise<
           })
 
           await newReview.save()
-          console.log(`Saved new Google review from ${googleReview.author_name}`)
+
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`Saved new Google review from ${googleReview.author_name}`)
+          }
           return newReview
         }
       } catch (error) {

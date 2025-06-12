@@ -9,7 +9,7 @@ export const register = async (req: Request, res: Response) => {
 
     const existingUser = await User.findOne({ email })
     if (existingUser) {
-      res.status(400).json({ message: 'User already exists with this email' })
+      res.status(400).json({ message: 'Користувач з цією поштою вже існує' })
       return
     }
 
@@ -34,7 +34,7 @@ export const register = async (req: Request, res: Response) => {
     res.status(201).json({ user: userData, token })
   } catch (error) {
     console.error('Error in register:', error)
-    res.status(500).json({ message: 'Server error during registration' })
+    res.status(500).json({ message: 'Помилка сервера при реєстрації' })
   }
 }
 
@@ -44,13 +44,13 @@ export const login = async (req: Request, res: Response) => {
 
     const user = await User.findOne({ email }).select('+password')
     if (!user) {
-      res.status(401).json({ message: 'Invalid email or password' })
+      res.status(401).json({ message: 'Неправильна пошта чи пароль' })
       return
     }
 
     const isMatch = await user.comparePassword(password)
     if (!isMatch) {
-      res.status(401).json({ message: 'Invalid email or password' })
+      res.status(401).json({ message: 'Неправильна пошта чи пароль' })
       return
     }
 
@@ -67,7 +67,7 @@ export const login = async (req: Request, res: Response) => {
     res.json({ user: userData, token })
   } catch (error) {
     console.error('Error in login:', error)
-    res.status(500).json({ message: 'Server error during login' })
+    res.status(500).json({ message: 'Помилка сервера при вході' })
   }
 }
 
@@ -76,14 +76,14 @@ export const getCurrentUser = async (req: Request, res: Response) => {
     const user = req.user
 
     if (!user) {
-      res.status(401).json({ message: 'Not authenticated' })
+      res.status(401).json({ message: 'Не підтверджено автентичність' })
       return
     }
 
     res.json(user)
   } catch (error) {
     console.error('Error getting current user:', error)
-    res.status(500).json({ message: 'Server error' })
+    res.status(500).json({ message: 'Помилка сервера' })
   }
 }
 
@@ -93,13 +93,13 @@ export const updateFavorites = async (req: Request, res: Response) => {
     const userId = req.user?.id
 
     if (!userId) {
-      res.status(401).json({ message: 'Not authenticated' })
+      res.status(401).json({ message: 'Не підтверджено автентичність' })
       return
     }
 
     const user = await User.findById(userId)
     if (!user) {
-      res.status(404).json({ message: 'User not found' })
+      res.status(404).json({ message: 'Не знайдено користувача' })
       return
     }
 
@@ -117,6 +117,6 @@ export const updateFavorites = async (req: Request, res: Response) => {
     res.json({ favorites: user.favorites })
   } catch (error) {
     console.error('Error updating favorites:', error)
-    res.status(500).json({ message: 'Server error' })
+    res.status(500).json({ message: 'Помилка сервера' })
   }
 }

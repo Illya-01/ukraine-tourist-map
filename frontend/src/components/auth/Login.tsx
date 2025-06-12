@@ -63,7 +63,15 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
   }
 
   return (
-    <Paper elevation={3} sx={{ p: 3, maxWidth: 400, width: '100%' }}>
+    <Paper
+      elevation={3}
+      sx={{
+        p: { xs: 2, sm: 3 },
+        maxWidth: 400,
+        width: '100%',
+        boxSizing: 'border-box',
+      }}
+    >
       <Typography variant="h5" component="h1" align="center" gutterBottom>
         Вхід
       </Typography>
@@ -74,9 +82,18 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
         </Alert>
       )}
 
-      <Box component="form" onSubmit={handleSubmit} noValidate>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        noValidate
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+        }}
+      >
         <TextField
-          margin="normal"
+          margin="dense"
           required
           fullWidth
           id="email"
@@ -89,9 +106,11 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
           error={!!formErrors.email}
           helperText={formErrors.email}
           disabled={loading}
+          size="small"
+          FormHelperTextProps={{ sx: { mx: 0 } }}
         />
         <TextField
-          margin="normal"
+          margin="dense"
           required
           fullWidth
           name="password"
@@ -104,12 +123,14 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
           error={!!formErrors.password}
           helperText={formErrors.password}
           disabled={loading}
+          size="small"
+          FormHelperTextProps={{ sx: { mx: 0 } }}
         />
         <Button
           type="submit"
           fullWidth
           variant="contained"
-          sx={{ mt: 3, mb: 2 }}
+          sx={{ mt: 2, mb: 1 }}
           disabled={loading}
         >
           {loading ? <CircularProgress size={24} /> : 'Увійти'}
@@ -119,7 +140,7 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
       <Box
         textAlign="center"
         sx={{
-          mt: 2,
+          mt: 1,
           width: '100%',
           display: 'flex',
           flexDirection: { xs: 'column', sm: 'row' },

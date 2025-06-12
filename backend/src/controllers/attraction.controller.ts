@@ -39,7 +39,7 @@ export const getAllAttractions = async (req: Request, res: Response) => {
     res.json(attractions)
   } catch (error) {
     console.error('Error getting attractions:', error)
-    res.status(500).json({ message: 'Failed to get attractions' })
+    res.status(500).json({ message: 'Не вдалося отримати визначні місця' })
   }
 }
 
@@ -48,14 +48,14 @@ export const getAttractionById = async (req: Request, res: Response) => {
     const attraction = await Attraction.findById(req.params.id)
 
     if (!attraction) {
-      res.status(404).json({ message: 'Attraction not found' })
+      res.status(404).json({ message: 'Визначне місце не знайдено' })
       return
     }
 
     res.json(attraction)
   } catch (error) {
     console.error('Error getting attraction:', error)
-    res.status(500).json({ message: 'Failed to get attraction' })
+    res.status(500).json({ message: 'Не вдалося отримати визначне місце' })
   }
 }
 
@@ -67,7 +67,7 @@ export const createAttraction = async (req: Request, res: Response) => {
     res.status(201).json(newAttraction)
   } catch (error) {
     console.error('Error creating attraction:', error)
-    res.status(400).json({ message: 'Failed to create attraction' })
+    res.status(400).json({ message: 'Не вдалося створити визначне місце' })
   }
 }
 
@@ -79,14 +79,14 @@ export const updateAttraction = async (req: Request, res: Response) => {
     })
 
     if (!attraction) {
-      res.status(404).json({ message: 'Attraction not found' })
+      res.status(404).json({ message: 'Не вдалося отримати визначне місце' })
       return
     }
 
     res.json(attraction)
   } catch (error) {
     console.error('Error updating attraction:', error)
-    res.status(400).json({ message: 'Failed to update attraction' })
+    res.status(400).json({ message: 'Не вдалося оновити визначне місце' })
   }
 }
 
@@ -95,14 +95,14 @@ export const deleteAttraction = async (req: Request, res: Response) => {
     const attraction = await Attraction.findByIdAndDelete(req.params.id)
 
     if (!attraction) {
-      res.status(404).json({ message: 'Attraction not found' })
+      res.status(404).json({ message: 'Визначне місце не знайдено' })
       return
     }
 
-    res.json({ message: 'Attraction deleted successfully' })
+    res.json({ message: 'Визначне місце успішно видалено' })
   } catch (error) {
     console.error('Error deleting attraction:', error)
-    res.status(500).json({ message: 'Failed to delete attraction' })
+    res.status(500).json({ message: 'Не вдалося видалити визначне місце ' })
   }
 }
 
@@ -111,7 +111,7 @@ export const searchNearbyAttractions = async (req: Request, res: Response) => {
     const { lat, lng, radius } = req.query
 
     if (!lat || !lng) {
-      res.status(400).json({ message: 'Latitude and longitude are required' })
+      res.status(400).json({ message: 'Необхідно вказати широту та довготу' })
       return
     }
 
@@ -127,7 +127,7 @@ export const searchNearbyAttractions = async (req: Request, res: Response) => {
     res.json(nearbyPlaces)
   } catch (error) {
     console.error('Error searching nearby attractions:', error)
-    res.status(500).json({ message: 'Failed to search nearby attractions' })
+    res.status(500).json({ message: 'Невдалося отримати визначні місця поблизу' })
   }
 }
 
@@ -136,7 +136,7 @@ export const importFromGooglePlaces = async (req: Request, res: Response) => {
     const { placeId } = req.body
 
     if (!placeId) {
-      res.status(400).json({ message: 'Place ID is required' })
+      res.status(400).json({ message: "Place ID є обов'язковим" })
       return
     }
 
@@ -144,7 +144,7 @@ export const importFromGooglePlaces = async (req: Request, res: Response) => {
     const existingAttraction = await Attraction.findOne({ googlePlaceId: placeId })
 
     if (existingAttraction) {
-      res.status(400).json({ message: 'Attraction already imported' })
+      res.status(400).json({ message: 'Визначне місце вже імпортовано' })
       return
     }
 
@@ -181,8 +181,8 @@ export const importFromGooglePlaces = async (req: Request, res: Response) => {
 
     res.status(201).json(attraction)
   } catch (error) {
-    console.error('Error importing from Google Places:', error)
-    res.status(500).json({ message: 'Failed to import from Google Places' })
+    console.error('Error importing attraction from Google Places:', error)
+    res.status(500).json({ message: 'Невдалося імпортувати визначне місце від Google Places' })
   }
 }
 
@@ -193,12 +193,12 @@ export const getAttractionReviews = async (req: Request, res: Response) => {
     const attraction = await Attraction.findById(id)
 
     if (!attraction) {
-      res.status(404).json({ message: 'Attraction not found' })
+      res.status(404).json({ message: 'Визначне місце не знайдено' })
       return
     }
 
     if (!attraction.googlePlaceId) {
-      res.status(400).json({ message: 'No Google Place ID available for this attraction' })
+      res.status(400).json({ message: 'Для цього визначного місця немає Google Place ID' })
       return
     }
 
@@ -209,6 +209,6 @@ export const getAttractionReviews = async (req: Request, res: Response) => {
     res.json({ reviews })
   } catch (error) {
     console.error('Error getting attraction reviews:', error)
-    res.status(500).json({ message: 'Failed to get attraction reviews' })
+    res.status(500).json({ message: 'Не вдалося отримати відгуки цього визначного місця' })
   }
 }

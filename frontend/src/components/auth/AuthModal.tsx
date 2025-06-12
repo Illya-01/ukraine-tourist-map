@@ -19,8 +19,27 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, initialView = 'login' }) =>
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogContent sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="sm"
+      PaperProps={{
+        sx: {
+          m: { xs: 2, sm: 4 },
+          width: '100%',
+          maxHeight: '95vh',
+          overflowY: 'auto',
+        },
+      }}
+    >
+      <DialogContent
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          py: { xs: 4, sm: 6 },
+          px: 0,
+        }}
+      >
         {view === 'login' ? (
           <Login onSwitchToRegister={() => setView('register')} />
         ) : (
