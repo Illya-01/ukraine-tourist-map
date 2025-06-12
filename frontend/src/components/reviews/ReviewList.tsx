@@ -57,26 +57,8 @@ const ReviewList: React.FC<ReviewListProps> = ({ attractionId }) => {
   const { reviews, loading, error } = useAppSelector(selectReviewsData)
   const dispatch = useAppDispatch()
 
-  // Helper function to check if a review belongs to the current user
-  const isUserReview = (review: Review, userId: string): boolean => {
-    if (!review.user) return false
-
-    // If user is an object with _id property
-    if (typeof review.user === 'object' && review.user._id) {
-      return review.user._id === userId
-    }
-
-    // If user is a string ID
-    if (typeof review.user === 'string') {
-      return review.user === userId
-    }
-
-    return false
-  }
-
   // Find user's review using the helper function
-  const userReview = user ? reviews.find(review => isUserReview(review, user.id)) : null
-  const canAddReview = isAuthenticated && !userReview && !showForm
+  const canAddReview = isAuthenticated && !showForm
 
   useEffect(() => {
     dispatch(setCurrentAttractionId(attractionId))

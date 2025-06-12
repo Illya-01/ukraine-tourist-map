@@ -64,7 +64,7 @@ export default function Header() {
             component="div"
             sx={{ display: { xs: 'none', sm: 'block' }, fontWeight: 'bold' }}
           >
-            Ukraine Tourist Map
+            Карта туристичних місць України
           </Typography>
         </Box>
 

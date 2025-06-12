@@ -48,10 +48,6 @@ export const addReview = async (req: Request, res: Response) => {
       source: 'user',
     })
 
-    if (existingReview) {
-      res.status(400).json({ message: 'Ви вже зробили відгук на це визначне місце' })
-      return
-    }
     const review = new Review({
       attraction: attractionId,
       user: req.user.id,
